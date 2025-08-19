@@ -274,8 +274,11 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE):
         pass
 
 # ---------------- Main ----------------
-def main():
-    app = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
+import asyncio
+
+async def main():
+    app = Application.builder().token(os.environ["TELEGRAM_BOT_TOKEN"]).build()
+
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("explain", explain))
     app.add_handler(CommandHandler("prompt", prompt_refiner))
@@ -284,16 +287,19 @@ def main():
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, explain))
     app.add_error_handler(error_handler)
 
-    # ✅ Webhook mode for Render
+    # ✅ Webhook mode (Render ke liye)
     PORT = int(os.environ.get("PORT", 8080))
-    WEBHOOK_URL = os.environ.get("WEBHOOK_URL")  # Render service URL (without /token)
-    app.run_webhook(
+    WEBHOOK_URL = os.environ["WEBHOOK_URL"]
+
+    await app.run_webhook(
         listen="0.0.0.0",
         port=PORT,
-        url_path=TELEGRAM_BOT_TOKEN,
-        webhook_url=f"{WEBHOOK_URL}/{TELEGRAM_BOT_TOKEN}"
+        url_path=os.environ["TELEGRAM_BOT_TOKEN"],
+        webhook_url=f"{WEBHOOK_URL}/{os.environ['TELEGRAM_BOT_TOKEN']}"
     )
 
+if __name__ == "__main__":
+    asyncio.run(main())
 if __name__ == "__main__":
     import asyncio
     asyncio.run(init_db())
