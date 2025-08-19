@@ -1,4 +1,4 @@
 python-telegram-bot==20.7
-openai
-asyncpg
-gunicorn
+openai==1.40.6
+asyncpg==0.29.0
+gunicorn==23.0.0
